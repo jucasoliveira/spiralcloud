@@ -1,0 +1,18 @@
+#!/bin/bash
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+RUNNER="${SCRIPT_DIR}/../script-runner/target/release/script-runner"
+
+echo "Looking for executable at: $RUNNER"
+
+if [ ! -f "$RUNNER" ]; then
+    echo "script-runner not found. Building project..."
+    cd "${SCRIPT_DIR}/../script-runner" || exit 1
+    cargo build --release
+    if [ $? -ne 0 ]; then
+        echo "Error: Failed to build script-runner"
+        exit 1
+    fi
+    cd - > /dev/null
+fi
+
+"$RUNNER" "$@" 
