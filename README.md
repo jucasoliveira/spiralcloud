@@ -1,5 +1,8 @@
 # Spiral Animation Metrics Visualization
 
+
+![ScreenRecording2024-11-27at17 46 39-ezgif com-video-to-gif-converter](https://github.com/user-attachments/assets/91b3f6cc-a35c-40c2-ac9e-2204333264e9)
+
 This project visualizes the performance of various programming languages in rendering a spiral animation by using recorded metrics. The animation showcases balls representing different programming languages moving back and forth horizontally, where the speed is determined by the average frame time.
 
 ## Project Overview
@@ -65,6 +68,7 @@ Frame Time: 12 ms, Points Drawn: 9585
 ```
 
 ## Metrics result
+![language_animation-ezgif com-video-to-gif-converter](https://github.com/user-attachments/assets/770a141f-17b4-4dd0-ade7-330439237e83)
 
 ![Metrics result](./language_animation.mp4)
 
