@@ -1,28 +1,21 @@
-# Get all txt files in the current directory
-# Get Frame Time and Points Drawn eg.: Frame Time: 2.20 ms, Points Drawn: 9591
-# For each programming language , calculate the average Frame Time and Points Drawn
-# Create a bar chart for each programming language
 import glob
 import re
 import numpy as np
 import matplotlib.pyplot as plt
+import matplotlib.animation as animation
 
+# Extract metrics from files
 txt_files = glob.glob('**/*.txt')
-
 metrics = {}
 
-
-# Extract the metrics from each file
 for file in txt_files:
-    print(file)
-    language = file.replace('metrics_', '').replace('.txt', '')
+    language = file.split('/')[-1]  # Get just the filename
+    language = language.replace('metrics_', '').replace('.txt', '')
     frame_times = []
     points_drawn = []
-    print(language)
 
     with open(file, 'r') as f:
         for line in f:
-
             match = re.search(
                 r'Frame\s*Time:\s*([\d.]+)\s*ms,\s*Points\s*Drawn:\s*(\d+)', line)
             if match:
@@ -37,27 +30,63 @@ for file in txt_files:
             'avg_points_drawn': avg_points_drawn
         }
 
-languages = list(metrics.keys())
+# Setup for the animation
+languages = sorted(
+    metrics.keys(), key=lambda lang: metrics[lang]['avg_frame_time'])
 avg_frame_times = [metrics[lang]['avg_frame_time'] for lang in languages]
-avg_points_drawn = [metrics[lang]['avg_points_drawn'] for lang in languages]
 
-x = np.arange(len(languages))
-width = 0.35
+# Configuration for animation
+x_max = 10000  # Maximum horizontal width for the balls
+fig, ax = plt.subplots(figsize=(10, 5))
 
-fig, ax = plt.subplots(2, 1, figsize=(10, 10))
+# Initialize positions and velocities for each language
+positions = np.zeros(len(languages))
+# Further slower speed by increasing divisor  # Slower speed by increasing divisor  # Slower speed by increasing divisor
+velocities = [x_max / (avg_frame_time * 20)
+              for avg_frame_time in avg_frame_times]
 
-ax[0].bar(x, avg_frame_times, width, label='Frame Time')
-ax[0].set_xticks(x, languages)
-ax[0].set_xlabel('Language')
-ax[0].set_ylabel('Average Frame Time (ms)')
-ax[0].legend()
+# Set up the plot
+ax.set_xlim(0, x_max)
+ax.set_ylim(-1, len(languages))
+ax.set_yticks(range(len(languages)))
+ax.set_yticklabels(languages, rotation=45)
+ax.set_xlabel('Position')
+ax.set_title('Languages Animation: Ball Speed Based on Average Frame Time')
+
+# Set different colors for each language
+colors = plt.cm.get_cmap('tab10', len(languages))
+
+# Initialize scatter plot for the balls
+# Doubled size of the balls again  # Doubled size of the balls  # Increased size of the balls
+scat = ax.scatter(positions, range(len(languages)), s=1200, color=[
+                  colors(i) for i in range(len(languages))])
 
 
-ax[1].bar(x, avg_points_drawn, width, label='Points Drawn')
-ax[1].set_xticks(x, languages)
-ax[1].set_xlabel('Language')
-ax[1].set_ylabel('Average Points Drawn')
-ax[1].legend()
+def update(frame):
+    global positions
+
+    # Update positions based on velocities
+    for i in range(len(positions)):
+        positions[i] += velocities[i]
+        # Reverse direction if the ball reaches the boundaries
+        if positions[i] >= x_max or positions[i] <= 0:
+            velocities[i] *= -1
+
+    # Update scatter plot with new positions
+    scat.set_offsets(np.c_[positions, range(len(languages))])
+    return scat,
+
+
+# Create the animation
+ani = animation.FuncAnimation(
+    fig, update, frames=np.arange(0, 1000), interval=20, blit=True)
+
+# Save animation as MP4
+writer = animation.FFMpegWriter(fps=50, bitrate=1800)
+ani.save('language_animation.mp4', writer=writer)
+
+# Comment out or remove plt.show() if you don't want to display the animation while saving
+# plt.show()
 
 plt.tight_layout()
 plt.show()

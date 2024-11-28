@@ -1,13 +1,18 @@
 // HTML Canvas setup for rendering in the browser
-let canvas = document.getElementById('spiralCanvas');
+let canvas = document.getElementById('canvas');
 if (!canvas) {
   canvas = document.createElement('canvas');
   canvas.id = 'spiralCanvas';
   document.body.appendChild(canvas);
 }
-canvas.width = 800;
-canvas.height = 800;
 const ctx = canvas.getContext('2d');
+
+canvas.width = 800 ;
+canvas.height = 800 ;
+canvas.style.backgroundColor = 'black';
+canvas.style.borderRadius = '10px';
+canvas.style.boxShadow = '0 0 10px 0 rgba(0, 0, 0, 0.5)';
+canvas.style.margin = '10px';
 
 const n = 99999;
 const p = new Array(n).fill(0);
@@ -60,13 +65,20 @@ function draw() {
   // Calculate and log frame time
   const frameTime = performance.now() - startTime;
   const metricsEntry = `Frame Time: ${frameTime.toFixed(2)} ms, Points Drawn: ${pointsDrawn}`;
-  console.log(metricsEntry);
   metrics.push(metricsEntry);
+
+  fetch('http://localhost:3000/add-to-logs', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ log: metricsEntry }),
+  }).then(response => response.text())
+    .then(console.log)
+    .catch(console.error);
 
   frameCount++;
 
   if (frameCount >= max_frames) {
-    downloadMetrics();
+   
     return; // Stop the animation after downloading metrics
   }
 
@@ -76,23 +88,6 @@ function draw() {
 }
 
 
-function downloadMetrics() {
-  const metricsText = metrics.join('\n');
-  const blob = new Blob([metricsText], { type: 'text/plain' });
-  const url = URL.createObjectURL(blob);
-
-  const downloadLink = document.createElement('a');
-  downloadLink.href = url;
-  downloadLink.download = 'metrics_node.txt';
-  downloadLink.style.display = 'none';
-  document.body.appendChild(downloadLink);
-
-  downloadLink.click();
-
-  // Clean up
-  document.body.removeChild(downloadLink);
-  URL.revokeObjectURL(url);
-}
 
 
 

@@ -104,6 +104,7 @@ int main(int argc, char *argv[])
 
         // Draw points for primes
         SDL_SetRenderDrawColor(ren, 255, 255, 255, 255);
+        SDL_Point points[N];
         int points_drawn = 0;
         for (int i = 3; i < N; i++)
         {
@@ -113,12 +114,12 @@ int main(int argc, char *argv[])
                 int y = (int)(cos(i * t) * (i / 99.0f) + HEIGHT / 2);
                 if (x >= 0 && x < WIDTH && y >= 0 && y < HEIGHT)
                 {
-                    SDL_RenderDrawPoint(ren, x, y);
-                    points_drawn++;
+                    points[points_drawn++] = (SDL_Point){x, y};
                 }
             }
         }
 
+        SDL_RenderDrawPoints(ren, points, points_drawn);
         // Update the screen
         SDL_RenderPresent(ren);
 

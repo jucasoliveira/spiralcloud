@@ -4,7 +4,8 @@
   "description": "",
   "main": "spiral.js",
   "scripts": {
-    "dev": "node spiral.js"
+    "dev": "node index.js",
+    "server": "node index.js"
   },
   "keywords": [],
   "author": "",

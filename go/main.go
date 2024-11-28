@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"image/color"
 	"math"
@@ -27,13 +28,15 @@ type Game struct {
 
 func (g *Game) Update() error {
 	g.t += 1e-7
+	if g.frame_count >= max_frames {
+		g.file.Close()
+		return errors.New("closing window")
+	}
 	return nil
 }
 
 func (g *Game) Draw(screen *ebiten.Image) {
-	if g.frame_count >= max_frames {
-		return
-	}
+
 	start := time.Now()
 
 	screen.Fill(color.Black)
@@ -51,8 +54,7 @@ func (g *Game) Draw(screen *ebiten.Image) {
 	}
 
 	g.frame_count += 1
-
-	fmt.Fprintf(g.file, "Frame Time: %d ms, Points Drawn: %d\n", time.Since(start).Milliseconds(), pointsDrawn)
+	fmt.Fprintf(g.file, "Frame Time: %.2f ms, Points Drawn: %d\n", time.Since(start).Seconds()*1000, pointsDrawn)
 }
 
 func (g *Game) Layout(outsideWidth, outsideHeight int) (int, int) {
